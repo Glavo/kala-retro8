@@ -26,7 +26,7 @@ classfile version, because the compilation phase will be done with Java 8 target
 
 However, Jabel cannot handle JPMS well. This plugin solves this problem.
 
-This plug-in will specify the target version of the compiler as 9, 
+This plugin will specify the target version of the compiler as 9, 
 and then process class files other than `module-info.class` to make them
 compatible with Java 8. 
 
@@ -37,6 +37,8 @@ Through this approach, Kala retro8 has the best compatibility with JPMS,
 which is the same as when using Java 9.
 
 ## How to avoid using Java 9+ APIs in IntelliJ IDEA?
+
+By Jabel documents:
 
 > If you set `--release=8` flag, the compiler will report usages of APIs that were not in Java 8 (e.g. `StackWalker`). But if you wish to see such usages while editing the code, you can make IDEA highlight them for you:
 > 
