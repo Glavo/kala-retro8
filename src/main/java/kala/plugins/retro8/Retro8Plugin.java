@@ -4,12 +4,9 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
-import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.plugins.JavaPluginExtension;
-import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
@@ -17,16 +14,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.security.CodeSource;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Retro8Plugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
+        Retro8Extension extension = project.getExtensions().create("retro8", Retro8Extension.class);
+
         project.getTasks().create("retro8ProcessClasses", Retro8ProcessClassesTask.class, task -> {
             task.setGroup("retro8");
             task.getClassFiles().set(project.<FileCollection>provider(() ->

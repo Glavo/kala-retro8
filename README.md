@@ -1,4 +1,4 @@
-# Kala Retro8 - use modern Java 9+ syntax and JPMS when targeting Java 8
+# Kala Retro8 - Gradle plugin for use modern Java 9+ syntax and JPMS when targeting Java 8
 
 > Make Java 8 Great Again.
 
