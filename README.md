@@ -56,14 +56,14 @@ the plugin has handled everything for you behind the scenes.
 
 ```groovy
 plugins {
-  id "org.glavo.kala-retro8" version "1.0.0"
+  id "org.glavo.kala-retro8" version "1.1"
 }
 ```
 
 Kotlin DSL:
 ```kotlin
 plugins {
-  id("org.glavo.kala-retro8") version "1.0.0"
+  id("org.glavo.kala-retro8") version "1.1"
 }
 ```
 
@@ -104,17 +104,15 @@ For more details, see [Jabel - use modern Java 9-14 syntax when targeting Java 8
 Applying the plug-in will automatically perform the following operations:
 
 * Set release to 9 in the options of `compilejava`.
+* Attach Jabel to the annotation processor path of the compileJava task options.
 * Add the compiler parameter `-Xplugin:jabel` to enable Jabel.
 
 It inserts two tasks into the build process:
 
-* `retro8ExtractJabel`: The task will extract Jabel into the `$buildDir/jabel`,
-  And attach these files to the annotation processor path of the compileJava task options.
+* `retro8ExtractJabel`: The task will extract Jabel into temporary folder,
 * `retro8ProcessClasses`: It traverses the classDirs of the main sourceSet and processes Java 9 bytecode 
   other than `module-info.class` into Java 8 bytecode.
 
 The `compileJava` task depends on `retro8ExtractJabel`.
 
 The `retro8ProcessClasses` task depends on `compileJava`, and be depends on the `classes` task.
-
-(I think maybe `retro8ExtractJabel` should be removed? It might be better to store Jabel in a global location.)
