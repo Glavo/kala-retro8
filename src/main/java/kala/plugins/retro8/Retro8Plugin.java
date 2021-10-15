@@ -10,11 +10,17 @@ import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.CodeSource;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,28 +53,24 @@ public class Retro8Plugin implements Plugin<Project> {
             project.getTasks().getByName("classes").dependsOn(task);
         });
 
-        File jabelDir = new File(project.getBuildDir(), "jabel");
+        Path jabelDir = Paths.get(System.getProperty("java.io.tmpdir"), "org.glavo.kala-retro8", "jabel");
+
+
         project.getTasks().create("retro8ExtractJabel", task -> {
             task.setGroup("retro8");
 
-            Path thisJar = Optional.ofNullable(Retro8Plugin.class.getProtectionDomain().getCodeSource())
-                    .map(CodeSource::getLocation)
-                    .map(url -> {
-                        try {
-                            return Paths.get(url.toURI());
-                        } catch (Throwable ex) {
-                            throw new GradleException("Unable to unzip jabel", ex);
-                        }
-                    })
-                    .orElseThrow(() -> new GradleException("Unable to unzip jabel"));
-
             try {
-                FileSystem fs = FileSystems.newFileSystem(thisJar, (ClassLoader) null);
-                Path jabelInJar = fs.getPath("kala/plugins/retro8/jabel");
+                Map<String, Integer> jabelFiles;
 
-                List<Path> jabelFiles;
-                try (Stream<Path> files = Files.list(jabelInJar)) {
-                    jabelFiles = files.collect(Collectors.toList());
+                //noinspection ConstantConditions
+                try (BufferedReader reader =
+                             new BufferedReader(new InputStreamReader(
+                                     Retro8Plugin.class.getResourceAsStream("jabel/list.txt"),
+                                     StandardCharsets.UTF_8))) {
+                    jabelFiles = reader.lines()
+                            .filter(s -> !s.isEmpty())
+                            .map(s -> s.split(":"))
+                            .collect(Collectors.toMap(arr -> arr[0], arr -> Integer.parseInt(arr[1])));
                 }
 
                 JavaCompile compileJava = (JavaCompile) project.getTasks().getByName("compileJava");
@@ -79,28 +81,30 @@ public class Retro8Plugin implements Plugin<Project> {
 
                 options.getCompilerArgs().add("-Xplugin:jabel");
 
+                ConfigurableFileCollection files =
+                        project.files(jabelFiles.keySet().stream().map(jabelDir::resolve).collect(Collectors.toList()));
+
+                options.setAnnotationProcessorPath(
+                        Optional.ofNullable(options.getAnnotationProcessorPath())
+                                .map(it -> it.plus(files))
+                                .orElse(files)
+                );
+
                 task.doFirst(t -> {
-                    ConfigurableFileCollection files =
-                            project.files(jabelFiles.stream().map(file -> new File(jabelDir, file.getFileName().toString()))
-                                    .collect(Collectors.toList()));
-
-                    options.setAnnotationProcessorPath(
-                            Optional.ofNullable(options.getAnnotationProcessorPath())
-                                    .map(it -> it.plus(files))
-                                    .orElse(files)
-                    );
-
                     try {
-                        //noinspection ResultOfMethodCallIgnored
-                        jabelDir.mkdirs();
-
-                        for (Path file : jabelFiles) {
-                            Path target = new File(jabelDir, file.getFileName().toString()).toPath();
-                            if (Files.notExists(target)) {
-                                Files.copy(file, target);
+                        Files.createDirectories(jabelDir);
+                        for (String file : jabelFiles.keySet()) {
+                            Path target = jabelDir.resolve(file);
+                            if (Files.notExists(target) || Files.size(target) != jabelFiles.get(file)) {
+                                project.getLogger().quiet("Extract " + file + " to " + target);
+                                try (InputStream source = Retro8Plugin.class.getResourceAsStream("jabel/" + file)) {
+                                    //noinspection ConstantConditions
+                                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                                }
+                                target.toFile().deleteOnExit();
                             }
                         }
-                    } catch (IOException e) {
+                    } catch (Throwable e) {
                         throw new GradleException("Unable to unzip jabel", e);
                     }
                 });

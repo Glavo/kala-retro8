@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.glavo"
-version = "1.0"
+version = "1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -32,8 +32,19 @@ java {
 }
 
 tasks.jar {
+    val listFile = File(buildDir, "list.txt")
+
+    doFirst {
+        listFile.printWriter().use { writer ->
+            for (file in jabel.files) {
+                writer.println(file.name + ":" + file.length())
+            }
+        }
+    }
+
     into("kala/plugins/retro8/jabel") {
         from(jabel)
+        from(listFile)
     }
 }
 

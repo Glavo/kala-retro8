@@ -18,10 +18,10 @@ public abstract class Retro8ProcessClassesTask extends DefaultTask {
     public void process() {
         getClassFiles().get().forEach(file -> {
             try (RandomAccessFile rf = new RandomAccessFile(file, "rw")) {
-                rf.seek(7); // major version
-                if (rf.read() > 52) {
+                rf.seek(7);        // major version
+                if (rf.read() == 53) { // Java 9
                     rf.seek(7);
-                    rf.write(52);
+                    rf.write(52);   // Java 8
                 }
             } catch (IOException exception) {
                 getLogger().log(LogLevel.WARN, "File: " + file, exception);
