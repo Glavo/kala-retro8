@@ -112,3 +112,9 @@ It inserts two tasks into the build process:
   And attach these files to the annotation processor path of the compileJava task options.
 * `retro8ProcessClasses`: It traverses the classDirs of the main sourceSet and processes Java 9 bytecode 
   other than `module-info.class` into Java 8 bytecode.
+
+The `compileJava` task depends on `retro8ExtractJabel`.
+
+The `retro8ProcessClasses` task depends on `compileJava`, and be depends on the `classes` task.
+
+(I think maybe `retro8ExtractJabel` should be removed? It might be better to store Jabel in a global location.)
