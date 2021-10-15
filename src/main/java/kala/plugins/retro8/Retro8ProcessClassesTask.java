@@ -4,14 +4,14 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.logging.LogLevel;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.OutputFiles;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public abstract class Retro8ProcessClassesTask extends DefaultTask {
-    @InputFiles
+    @OutputFiles
     public abstract Property<FileCollection> getClassFiles();
 
     @TaskAction

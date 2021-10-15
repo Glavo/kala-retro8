@@ -98,3 +98,17 @@ tasks.compileJava {
 ```
 
 For more details, see [Jabel - use modern Java 9-14 syntax when targeting Java 8](https://github.com/bsideup/jabel).
+
+## What did it do behind the scenes?
+
+Applying the plug-in will automatically perform the following operations:
+
+* Set release to 9 in the options of `compilejava`.
+* Add the compiler parameter `-Xplugin:jabel` to enable Jabel.
+
+It inserts two tasks into the build process:
+
+* `retro8ExtractJabel`: The task will extract Jabel into the `$buildDir/jabel`,
+  And attach these files to the annotation processor path of the compileJava task options.
+* `retro8ProcessClasses`: It traverses the classDirs of the main sourceSet and processes Java 9 bytecode 
+  other than `module-info.class` into Java 8 bytecode.
