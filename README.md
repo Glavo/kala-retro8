@@ -51,6 +51,8 @@ By Jabel documents:
 
 ## Usage
 
+[Gradle Plugin: kala-retro8](https://plugins.gradle.org/plugin/org.glavo.kala-retro8)
+
 You just need to apply the plugin like this,
 the plugin has handled everything for you behind the scenes.
 
