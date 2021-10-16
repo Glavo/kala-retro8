@@ -1,8 +1,8 @@
 # Kala Retro8 - Gradle plugin for use modern Java 9+ syntax and JPMS when targeting Java 8
 
-> Make Java 8 Great Again.
+[![](https://img.shields.io/gradle-plugin-portal/v/org.glavo.kala-retro8)](https://plugins.gradle.org/plugin/org.glavo.kala-retro8) 
 
-**The plugin has been submitted and is waiting for gradle official approval, please wait a few days.**
+> Make Java 8 Great Again.
 
 Kala retro8 is a gradle plugin, Kala retro8 is a gradle plugin. 
 It is used to support the use of Java 9 and later syntax in Java 8.
